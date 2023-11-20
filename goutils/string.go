@@ -1,7 +1,6 @@
 package goutils
 
 import (
-	"reflect"
 	"sort"
 	"strings"
 	"unicode"
@@ -12,25 +11,6 @@ func TrimSpaceAndQuote(s string) string {
 	return strings.TrimFunc(s, func(r rune) bool {
 		return unicode.IsSpace(r) || r == '"' || r == '\''
 	})
-}
-
-// ToString returns a string converted directly by type without serialization.
-// If it cannot be converted, a string of zero value is returned.
-func ToString(v any) string {
-	val := reflect.ValueOf(v)
-	for val.Kind() == reflect.Ptr {
-		if val.IsNil() {
-			return ""
-		}
-		val = val.Elem()
-	}
-	switch s := val.Interface().(type) {
-	case []byte:
-		return BytesToString(s)
-	case string:
-		return s
-	}
-	return ""
 }
 
 // HidePassword returns a string that hides the password as a *

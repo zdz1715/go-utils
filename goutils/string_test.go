@@ -22,13 +22,19 @@ func TestTrimSpaceAndQuote(t *testing.T) {
 	}
 }
 
+func TestHidePassword(t *testing.T) {
+	t.Log(HidePassword("s=123456", "123456"))
+	t.Log(HidePassword("s1=123 s2=123456", "123", "123456"))
+}
+
 func BenchmarkHidePassword(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		HidePassword("password=123456", "123456")
 	}
 }
 
-func TestHidePassword(t *testing.T) {
-	t.Log(HidePassword("s=123456", "123456"))
-	t.Log(HidePassword("s1=123 s2=123456", "123", "123456"))
+func BenchmarkTrimSpaceAndQuote(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		TrimSpaceAndQuote(" \"Alpine Linux\" ")
+	}
 }
