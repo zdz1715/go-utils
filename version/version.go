@@ -98,7 +98,7 @@ func (v *Version) complete() bool {
 	return false
 }
 
-func NewVersion(v string) *Version {
+func New(v string) *Version {
 	ver := new(Version)
 	if v == "" {
 		return ver
