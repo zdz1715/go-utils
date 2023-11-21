@@ -80,7 +80,7 @@ func TestNewVersion(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		ver := NewVersion(tt.version)
+		ver := New(tt.version)
 
 		if !reflect.DeepEqual(ver, tt.want) {
 			t.Errorf("version=%s target=%s want=%s", tt.version, ver, tt.want)
@@ -90,12 +90,12 @@ func TestNewVersion(t *testing.T) {
 
 func BenchmarkParseVersion(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		NewVersion("v1.20.3-2009-03-21")
+		New("v1.20.3-2009-03-21")
 	}
 }
 
 func BenchmarkVersion_String(b *testing.B) {
-	v := NewVersion("v1.20.3-2009-03-21")
+	v := New("v1.20.3-2009-03-21")
 	for i := 0; i < b.N; i++ {
 		v.String()
 	}
