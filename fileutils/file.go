@@ -1,6 +1,7 @@
 package fileutils
 
 import (
+	"errors"
 	"github.com/zdz1715/go-utils/ioutils"
 	"io"
 	"os"
@@ -65,17 +66,19 @@ func ReadLineFunc(path string, f func(num int, line string) bool) error {
 
 // IsDir reports whether this path is a directory
 func IsDir(path string) bool {
-	b, _ := IsDirE(path)
-	return b
+	return IsDirE(path) == nil
 }
 
-// IsDirE returns whether this path is a directory and error
-func IsDirE(path string) (bool, error) {
-	if f, err := os.Stat(path); err != nil {
-		return false, err
-	} else {
-		return f.IsDir(), nil
+// IsDirE returns an error as to whether this path is a directory
+func IsDirE(path string) error {
+	f, err := os.Stat(path)
+	if err != nil {
+		return err
 	}
+	if f.IsDir() {
+		return nil
+	}
+	return &os.PathError{Op: "IsDirE", Path: path, Err: errors.New("no such directory")}
 }
 
 // IsNotExist reports whether this path is not exist

@@ -17,3 +17,9 @@ func TestFileLineFunc(t *testing.T) {
 	s = append(s, 2)
 	fmt.Println(s[0], s[1])
 }
+
+func TestIsDirE(t *testing.T) {
+	if err := IsDirE("./file.go"); err != nil {
+		t.Fatal(err)
+	}
+}
