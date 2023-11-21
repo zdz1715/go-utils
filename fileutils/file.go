@@ -65,19 +65,30 @@ func ReadLineFunc(path string, f func(num int, line string) bool) error {
 
 // IsDir reports whether this path is a directory
 func IsDir(path string) bool {
+	b, _ := IsDirE(path)
+	return b
+}
+
+// IsDirE returns whether this path is a directory and error
+func IsDirE(path string) (bool, error) {
 	if f, err := os.Stat(path); err != nil {
-		return false
+		return false, err
 	} else {
-		return f.IsDir()
+		return f.IsDir(), nil
 	}
 }
 
-func ReadLineFromEndFunc(path string, f func(file *os.File, line string)) error {
-	file, err := os.OpenFile(path, os.O_RDWR, 0666)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
+// IsNotExist reports whether this path is not exist
+func IsNotExist(path string) bool {
+	b, _ := IsNotExistE(path)
+	return b
+}
 
-	return nil
+// IsNotExistE returns whether this path is not exist and error
+func IsNotExistE(path string) (bool, error) {
+	if _, err := os.Stat(path); err != nil {
+		return os.IsNotExist(err), err
+	} else {
+		return false, nil
+	}
 }
