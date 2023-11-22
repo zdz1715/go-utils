@@ -1,0 +1,9 @@
+{
+  "name": "go-utils",
+  "dockerFile": "Dockerfile",
+  "postCreateCommand": "go mod download",
+  "containerEnv": {},
+  "shutdownAction": "stopContainer",
+  "privileged": true,
+  "capAdd": []
+}

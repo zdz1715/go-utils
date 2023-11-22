@@ -1,13 +1,26 @@
 package version
 
 import (
+	"strconv"
+	"strings"
 	"unicode"
 )
 
+type status uint8
+
+const (
+	majorSet status = 1 << iota
+	minorSet
+	patchSet
+
+	allSet = majorSet | minorSet | patchSet
+)
+
 type Version struct {
-	major  string
-	minor  string
-	patch  string
+	major  int
+	minor  int
+	patch  int
+	status status
 	latest bool
 }
 
@@ -15,20 +28,20 @@ func (v *Version) String() string {
 	if v.latest {
 		return "latest"
 	}
-
-	if v.major == "" {
+	if v.status&majorSet == 0 {
 		return ""
 	}
-
-	if v.minor == "" {
-		return v.major
+	builder := new(strings.Builder)
+	builder.WriteString(strconv.Itoa(v.major))
+	if v.status&minorSet != 0 {
+		builder.WriteByte('.')
+		builder.WriteString(strconv.Itoa(v.minor))
 	}
-
-	if v.patch == "" {
-		return v.major + "." + v.minor
+	if v.status&patchSet != 0 {
+		builder.WriteByte('.')
+		builder.WriteString(strconv.Itoa(v.patch))
 	}
-
-	return v.major + "." + v.minor + "." + v.patch
+	return builder.String()
 }
 
 func (v *Version) Version(prefix ...string) string {
@@ -61,15 +74,15 @@ func (v *Version) Older(other *Version) bool {
 	return v.patch < other.patch
 }
 
-func (v *Version) Major() string {
+func (v *Version) Major() int {
 	return v.major
 }
 
-func (v *Version) Minor() string {
+func (v *Version) Minor() int {
 	return v.minor
 }
 
-func (v *Version) Patch() string {
+func (v *Version) Patch() int {
 	return v.patch
 }
 
@@ -77,28 +90,38 @@ func (v *Version) Latest() bool {
 	return v.latest
 }
 
-func (v *Version) add(num string) {
-	if v.major == "" {
-		v.major = num
+func (v *Version) addNum(n int) {
+	if v.status&majorSet == 0 {
+		v.major = n
+		v.status = majorSet
 		return
 	}
-	if v.minor == "" {
-		v.minor = num
+
+	if v.status&minorSet == 0 {
+		v.minor = n
+		v.status = majorSet | minorSet
 		return
 	}
-	if v.patch == "" {
-		v.patch = num
+
+	if v.status&patchSet == 0 {
+		v.patch = n
+		v.status = allSet
+		return
+	}
+}
+
+func (v *Version) add(str string) {
+	n, err := strconv.Atoi(str)
+	if err == nil {
+		v.addNum(n)
 	}
 }
 
 func (v *Version) complete() bool {
-	if v.major != "" && v.minor != "" && v.patch != "" {
-		return true
-	}
-	return false
+	return v.status == allSet
 }
 
-func New(v string) *Version {
+func ParseVersion(v string) *Version {
 	ver := new(Version)
 	if v == "" {
 		return ver
@@ -141,4 +164,22 @@ func New(v string) *Version {
 	}
 
 	return ver
+}
+
+// New 可以传负数忽略该版本数字，比如：New(10, 2, -1) string: 10.2
+func New(num ...int) *Version {
+	ver := new(Version)
+	for _, n := range num {
+		if ver.complete() {
+			break
+		}
+		ver.addNum(n)
+	}
+	return ver
+}
+
+func NewLatest() *Version {
+	return &Version{
+		latest: true,
+	}
 }
