@@ -22,7 +22,7 @@ func HidePassword(s string, password ...string) string {
 		if len(v) > 0 {
 			s = strings.ReplaceAll(s,
 				v,
-				strings.Repeat("*", len(v)),
+				strings.Repeat("*", 6),
 			)
 		}
 	}
